@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>MIFOTRA – Primary Teacher (Maths, Science & Tech) Exam</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f7f0;color:#1a3a2e}
+.top-bar{background:#2c5e3a;color:#fff;padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.top-bar h1{font-size:14px;font-weight:700;flex:1}
+.timer{background:rgba(255,255,255,.15);border-radius:6px;padding:6px 16px;font-size:15px;font-weight:700;letter-spacing:1px;min-width:92px;text-align:center}
+.timer.warn{background:#b91c1c;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.score-bar{background:#3d724d;padding:8px 22px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.stat{background:rgba(255,255,255,.12);border-radius:6px;padding:5px 13px;font-size:12px;color:#fff;font-weight:500}
+.stat b{font-size:14px;margin-left:3px}
+.prog-bg{background:#c8d9c5;height:5px}
+.prog-fg{background:#f4b942;height:5px;transition:width .3s}
+.screen{display:none}.screen.active{display:block}
+.sw{max-width:720px;margin:28px auto;padding:0 16px 50px}
+.sc{background:#fff;border-radius:20px;border:1px solid #d9e5d4;padding:28px;margin-bottom:16px}
+.logo-row{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.logo-icon{width:52px;height:52px;border-radius:12px;background:#2c5e3a;display:flex;align-items:center;justify-content:center}
+.igrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.ic{background:#f4faf2;border-radius:12px;padding:12px;text-align:center}
+.ic .iv{font-size:22px;font-weight:800;color:#2c5e3a}
+.ic .il{font-size:11px;color:#5b7c5f}
+.mleg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.mli{background:#f4faf2;border-radius:12px;padding:12px;text-align:center;border:1px solid #d9e5d4}
+.mli b{font-size:18px;color:#2c5e3a;display:block}
+.duty-list{background:#f8fef6;border-radius:16px;padding:18px;margin-bottom:20px;border-left:5px solid #f4b942}
+.duty-list h3{font-size:13px;font-weight:800;color:#2c5e3a;margin-bottom:8px}
+.duty-list ul{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-left:18px}
+.duty-list li{font-size:12px;color:#2d4a35}
+.btn-start{width:100%;padding:14px;background:#2c5e3a;color:#fff;border:none;border-radius:40px;font-size:16px;font-weight:700;cursor:pointer}
+.btn-start:hover{background:#1e442b}
+.ew{max-width:800px;margin:0 auto;padding:18px 16px 50px}
+.qcard{background:#fff;border:1.5px solid #deecd9;border-radius:20px;padding:20px 24px;margin-bottom:20px}
+.qcard.ok{border-left:6px solid #2ecc71}
+.qcard.fail{border-left:6px solid #e67e22}
+.qcard.skipped{border-left:6px solid #f4b942}
+.qmeta{display:flex;justify-content:space-between;margin-bottom:10px}
+.qnum{font-size:11px;font-weight:800;color:#7b9d76}
+.qpts{background:#eef4eb;color:#2c5e3a;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700}
+.qtext{font-size:15px;font-weight:600;color:#1a3a2e;margin-bottom:16px;line-height:1.45}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1.5px solid #deecd9;border-radius:14px;cursor:pointer;font-size:13.5px;background:#fff;transition:0.1s}
+.opt:hover:not(.disabled){border-color:#a5c9a0;background:#fafef8}
+.opt.sel{border-color:#2c5e3a;background:#eef7ea;font-weight:500}
+.opt.right{border-color:#2ecc71;background:#eafaf1}
+.opt.wrong{border-color:#e67e22;background:#fef5ea}
+.opt.showR{border-color:#2ecc71;background:#eafaf1}
+.opt.disabled{cursor:default}
+.opt-l{display:inline-flex;width:28px;height:28px;background:#deecd9;border-radius:10px;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#2c5e3a;flex-shrink:0}
+.opt.sel .opt-l{background:#2c5e3a;color:#fff}
+.opt.right .opt-l,.opt.showR .opt-l{background:#2ecc71;color:#fff}
+.opt.wrong .opt-l{background:#e67e22;color:#fff}
+.fb{margin-top:12px;padding:12px;border-radius:14px;font-size:13px;display:none;line-height:1.5}
+.fb.fok{background:#eafaf1;color:#1e6f3f;display:block}
+.fb.fbad{background:#fef5ea;color:#b45b0a;display:block}
+.fb.fskip{background:#fef9e6;color:#b45309;display:block}
+.navrow{display:flex;justify-content:flex-end;margin-top:14px}
+.btn-save{padding:8px 22px;background:#2c5e3a;color:#fff;border:none;border-radius:40px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-save.saved{background:#2ecc71}
+.rw{max-width:660px;margin:28px auto;padding:0 16px 50px}
+.big-score{font-size:72px;font-weight:800;line-height:1;margin-bottom:6px;color:#2c5e3a}
+.gbadge{display:inline-block;padding:6px 24px;border-radius:40px;font-size:14px;font-weight:700;margin-bottom:20px}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.rcell{background:#f4faf2;border-radius:16px;padding:14px;text-align:center}
+.rv{font-size:28px;font-weight:800}
+.rl{font-size:11px;color:#5b7c5f}
+.drow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #deecd9}
+.catrow{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.catlbl{width:170px;font-size:12px;font-weight:700}
+.catbw{flex:1;background:#deecd9;border-radius:20px;height:8px}
+.catbar{height:8px;border-radius:20px}
+.catpct{width:40px;font-size:12px;font-weight:700;text-align:right}
+.btnf{width:100%;padding:12px;border-radius:40px;font-size:14px;font-weight:700;margin-bottom:12px;border:none;cursor:pointer}
+.btn-rev{background:#fff;border:1.5px solid #2c5e3a;color:#2c5e3a}
+.btn-rs{background:#2c5e3a;color:#fff}
+.revw{max-width:800px;margin:0 auto;padding:18px 16px 50px}
+</style>
+</head>
+<body>
+
+<div id="startScreen" class="screen active">
+<div class="sw">
+  <div class="sc">
+    <div class="logo-row"><div class="logo-icon"><svg width="28" height="28" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4 4l2 2M18 4l2 2M4 20l2-2M18 20l2-2M2 12h4M18 12h4"/><circle cx="12" cy="12" r="4"/></svg></div><div><h2 style="font-size:20px;color:#2c5e3a">MIFOTRA EXAMS – PRIMARY TEACHER</h2><p style="font-size:13px;color:#5b7c5f">Mathematics, Science & Elementary Technology</p></div></div>
+    <div class="igrid"><div class="ic"><div class="iv">50</div><div class="il">Questions</div></div><div class="ic"><div class="iv">100</div><div class="il">Total Marks</div></div><div class="ic"><div class="iv">2h</div><div class="il">Time Limit</div></div><div class="ic"><div class="iv">60%</div><div class="il">Pass Mark</div></div></div>
+    <div class="mleg"><div class="mli"><b>All questions</b>2 marks each<br><span style="font-size:11px">Total 100 marks</span></div><div class="mli"><b>Subjects</b>Maths, Science, Technology, Pedagogy</div><div class="mli"><b>Primary level</b>Grades 1–6</div></div>
+    <div class="duty-list"><h3>Core competencies assessed</h3><ul><li>Primary mathematics (numbers, geometry, measurement)</li><li>Basic science (living things, matter, energy)</li><li>Elementary technology & ICT</li><li>Learner-centred pedagogy</li><li>Lesson planning & assessment</li><li>Inclusive teaching in primary</li><li>Use of TLMs & practical work</li></ul></div>
+    <button class="btn-start" onclick="startExam()">▶ START PRIMARY TEACHER EXAM</button>
+  </div>
+</div>
+</div>
+
+<div id="examScreen" class="screen">
+  <div class="top-bar"><h1>Primary Teacher – Maths, Science & Technology | MIFOTRA</h1><div class="timer" id="timerEl">2:00:00</div></div>
+  <div class="score-bar"><div class="stat">Answered <b id="qCounter">0/50</b></div><div class="stat">Saved <b id="liveSaved">0</b></div><div class="stat">Remaining <b id="liveRem">50</b></div><div style="margin-left:auto"><button onclick="confirmSubmit()" style="background:#d97706;color:#fff;border:none;border-radius:30px;padding:6px 18px;font-weight:700;cursor:pointer">Submit Exam</button></div></div>
+  <div class="prog-bg"><div class="prog-fg" id="progressBar" style="width:0%"></div></div>
+  <div class="ew" id="questionsContainer"></div>
+</div>
+
+<div id="resultScreen" class="screen"><div class="rw"><div class="sc" style="text-align:center"><h2 style="color:#2c5e3a">Exam Results – Primary Teacher</h2><div class="big-score" id="finalScore">0</div><div>out of 100 marks</div><div class="gbadge" id="gradeBadge"></div><div class="rgrid"><div class="rcell"><div class="rv" style="color:#2ecc71" id="rC">0</div><div class="rl">Correct</div></div><div class="rcell"><div class="rv" style="color:#e67e22" id="rW">0</div><div class="rl">Wrong</div></div><div class="rcell"><div class="rv" style="color:#f4b942" id="rS">0</div><div class="rl">Skipped</div></div></div><div style="background:#f4faf2;border-radius:16px;padding:16px;text-align:left"><div class="drow"><span>Time taken</span><strong id="rTime">—</strong></div><div class="drow"><span>Score percentage</span><strong id="rPct">—</strong></div><div class="drow"><span>Pass mark (60/100)</span><strong id="rResult">—</strong></div></div></div><div class="sc"><div style="font-weight:800;margin-bottom:12px">Performance by subject domain</div><div id="catBreakdown"></div></div><button class="btnf btn-rev" onclick="reviewAnswers()">Review all answers</button><button class="btnf btn-rs" onclick="restartExam()">Restart exam</button></div></div>
+
+<div id="reviewScreen" class="screen"><div class="top-bar"><h1>Answer review – Primary Teacher Exam</h1><button onclick="showScreen('resultScreen')" style="background:rgba(255,255,255,.2);border:none;border-radius:30px;padding:6px 16px;color:#fff;cursor:pointer">← Back</button></div><div class="revw" id="reviewContainer"></div></div>
+
+<script>
+// 50 questions: Primary Mathematics, Science, Elementary Technology + Pedagogy (2 marks each)
+const QUESTIONS = [
+{id:1,domain:"Mathematics",marks:2,text:"What is the least common multiple (LCM) of 6 and 8?",opts:["12","24","18","16"],ans:1,ex:"LCM of 6 and 8 is 24 (6×4, 8×3)."},
+{id:2,domain:"Mathematics",marks:2,text:"A rectangle has length 12 cm and width 5 cm. What is its perimeter?",opts:["60 cm","34 cm","24 cm","17 cm"],ans:1,ex:"Perimeter = 2×(12+5)=34 cm."},
+{id:3,domain:"Science",marks:2,text:"Which part of the plant absorbs water and minerals from the soil?",opts:["Stem","Leaves","Roots","Flower"],ans:2,ex:"Roots take up water and nutrients."},
+{id:4,domain:"Science",marks:2,text:"What is the main function of the human heart?",opts:["Pumping blood","Digesting food","Breathing","Thinking"],ans:0,ex:"Heart circulates blood throughout the body."},
+{id:5,domain:"Elementary Technology",marks:2,text:"Which device is used to enter text into a computer?",opts:["Monitor","Keyboard","Printer","Speaker"],ans:1,ex:"Keyboard is an input device for text."},
+{id:6,domain:"Primary Pedagogy",marks:2,text:"Which teaching method is most effective for teaching counting to young learners?",opts:["Lecture only","Using concrete objects like counters and blocks","Written tests only","Memorising tables without understanding"],ans:1,ex:"Concrete manipulatives build number sense."},
+{id:7,domain:"Mathematics",marks:2,text:"3/4 + 1/2 = ?",opts:["1/4","4/6","1 1/4","1/2"],ans:2,ex:"3/4 + 2/4 = 5/4 = 1 1/4."},
+{id:8,domain:"Science",marks:2,text:"Which of these is a renewable source of energy?",opts:["Coal","Natural gas","Solar energy","Petrol"],ans:2,ex:"Solar energy is renewable (sun)."},
+{id:9,domain:"Elementary Technology",marks:2,text:"What does CPU stand for?",opts:["Central Processing Unit","Computer Personal Unit","Central Program Utility","Core Power Unit"],ans:0,ex:"CPU is the brain of the computer."},
+{id:10,domain:"Primary Pedagogy",marks:2,text:"A primary teacher should use formative assessment to:",opts:["Punish students","Monitor learning and adjust teaching","Compute final grades only","Compare schools"],ans:1,ex:"Formative assessment guides instruction."},
+{id:11,domain:"Mathematics",marks:2,text:"Convert 2500 grams to kilograms.",opts:["2.5 kg","25 kg","250 kg","0.25 kg"],ans:0,ex:"1000 g = 1 kg → 2500 g = 2.5 kg."},
+{id:12,domain:"Science",marks:2,text:"Which state of matter has a fixed shape and volume?",opts:["Solid","Liquid","Gas","Plasma"],ans:0,ex:"Solids retain shape and volume."},
+{id:13,domain:"Elementary Technology",marks:2,text:"Which of the following is an output device?",opts:["Mouse","Scanner","Printer","Keyboard"],ans:2,ex:"Printer produces physical output."},
+{id:14,domain:"Primary Pedagogy",marks:2,text:"In a learner‑centred classroom, the teacher acts as a:",opts:["Dictator","Facilitator and guide","Only lecturer","Disciplinarian only"],ans:1,ex:"Facilitator supports active learning."},
+{id:15,domain:"Mathematics",marks:2,text:"What is the area of a square with side 7 cm?",opts:["28 cm²","49 cm²","14 cm²","21 cm²"],ans:1,ex:"Area = side² = 7×7 = 49 cm²."},
+{id:16,domain:"Science",marks:2,text:"Which sense organ is used for seeing?",opts:["Ear","Nose","Eye","Skin"],ans:2,ex:"Eyes detect light and images."},
+{id:17,domain:"Elementary Technology",marks:2,text:"The internet is a global network that allows:",opts:["Only email","Sharing information and communication","Watching TV only","Playing offline games"],ans:1,ex:"Internet connects computers worldwide for data sharing."},
+{id:18,domain:"Primary Pedagogy",marks:2,text:"Why is play‑based learning important in early primary?",opts:["It wastes time","It develops social, cognitive and motor skills naturally","It is only for entertainment","It replaces all academic work"],ans:1,ex:"Play fosters holistic development."},
+{id:19,domain:"Mathematics",marks:2,text:"What is the value of 8 × (5 + 3) ?",opts:["40","64","46","24"],ans:1,ex:"Order of operations: 8×8=64."},
+{id:20,domain:"Science",marks:2,text:"Which simple machine is a wheel with a rope used to lift heavy loads?",opts:["Lever","Pulley","Screw","Inclined plane"],ans:1,ex:"Pulley changes direction of force."},
+{id:21,domain:"Elementary Technology",marks:2,text:"Which software is used to create slide presentations?",opts:["Word processor","Spreadsheet","Presentation software (e.g., PowerPoint)","Web browser"],ans:2,ex:"Presentation software designs slideshows."},
+{id:22,domain:"Primary Pedagogy",marks:2,text:"Differentiated instruction means:",opts:["Same lesson for all","Adjusting content, process or product based on learner readiness","Separating learners permanently","Only group work"],ans:1,ex:"Differentiation meets diverse needs."},
+{id:23,domain:"Mathematics",marks:2,text:"If a dozen eggs cost 2400 RWF, what is the cost of one egg?",opts:["200 RWF","240 RWF","120 RWF","400 RWF"],ans:0,ex:"12 eggs → 2400/12 = 200 RWF."},
+{id:24,domain:"Science",marks:2,text:"Which gas do plants absorb from the air for photosynthesis?",opts:["Oxygen","Nitrogen","Carbon dioxide","Hydrogen"],ans:2,ex:"Plants use CO₂ to make food."},
+{id:25,domain:"Elementary Technology",marks:2,text:"What is the main purpose of a mouse?",opts:["Display images","Point, click and interact with the computer","Print documents","Store files"],ans:1,ex:"Mouse is a pointing input device."},
+{id:26,domain:"Primary Pedagogy",marks:2,text:"A scheme of work is:",opts:["Daily lesson plan","Long‑term plan outlining topics and timing for a term/year","Student timetable","Assessment record"],ans:1,ex:"Scheme of work guides termly coverage."},
+{id:27,domain:"Mathematics",marks:2,text:"What is 15% of 200?",opts:["15","30","20","25"],ans:1,ex:"0.15 × 200 = 30."},
+{id:28,domain:"Science",marks:2,text:"Which animal is classified as a mammal?",opts:["Snake","Frog","Whale","Crocodile"],ans:2,ex:"Whales breathe air, have hair and nurse young."},
+{id:29,domain:"Elementary Technology",marks:2,text:"What does 'ICT' stand for?",opts:["Information and Communication Technology","Internet Computer Time","Integrated Circuit Technology","International Code of Technology"],ans:0,ex:"ICT encompasses digital tools."},
+{id:30,domain:"Primary Pedagogy",marks:2,text:"How can a teacher support a learner with dyslexia in a mathematics lesson?",opts:["Ignore the difficulty","Provide extra time, use visual aids and multisensory methods","Separate the learner","Reduce all tasks"],ans:1,ex:"Inclusive strategies accommodate specific needs."},
+{id:31,domain:"Mathematics",marks:2,text:"Simplify 12/18 to its lowest terms.",opts:["6/9","4/6","2/3","3/4"],ans:2,ex:"Divide numerator and denominator by 6 → 2/3."},
+{id:32,domain:"Science",marks:2,text:"Which of the following is a conductor of electricity?",opts:["Rubber","Copper","Wood","Plastic"],ans:1,ex:"Metals like copper conduct electricity."},
+{id:33,domain:"Elementary Technology",marks:2,text:"To save a document, you can press:",opts:["Ctrl+C","Ctrl+V","Ctrl+S","Ctrl+P"],ans:2,ex:"Ctrl+S is the shortcut for Save."},
+{id:34,domain:"Primary Pedagogy",marks:2,text:"Which of these is an example of a teaching and learning material (TLM) for science?",opts:["Chalk only","Model of the solar system","School calendar","Uniform"],ans:1,ex:"Models concretise abstract concepts."},
+{id:35,domain:"Mathematics",marks:2,text:"What is the next number in the sequence: 2, 5, 8, 11, ?",opts:["12","13","14","15"],ans:1,ex:"Add 3 each time → 11+3=14."},
+{id:36,domain:"Science",marks:2,text:"Which force pulls objects towards the Earth?",opts:["Magnetism","Friction","Gravity","Buoyancy"],ans:2,ex:"Gravity is the attractive force."},
+{id:37,domain:"Elementary Technology",marks:2,text:"Which storage device is portable and uses flash memory?",opts:["Hard disk","CD‑ROM","USB flash drive","RAM"],ans:2,ex:"USB drives are portable and rewritable."},
+{id:38,domain:"Primary Pedagogy",marks:2,text:"A teacher asks open‑ended questions to:",opts:["Make students quiet","Encourage critical thinking and multiple answers","Save time","Only test memory"],ans:1,ex:"Open questions promote higher-order thinking."},
+{id:39,domain:"Mathematics",marks:2,text:"A triangle has angles 50° and 60°. What is the third angle?",opts:["70°","80°","60°","50°"],ans:0,ex:"Sum of angles = 180° → 180-110=70°."},
+{id:40,domain:"Science",marks:2,text:"Which part of the human body is protected by the skull?",opts:["Heart","Brain","Lungs","Stomach"],ans:1,ex:"Skull protects the brain."},
+{id:41,domain:"Elementary Technology",marks:2,text:"What is a browser used for?",opts:["Edit photos","Access websites on the internet","Write documents","Send emails only"],ans:1,ex:"Browsers like Chrome display web pages."},
+{id:42,domain:"Primary Pedagogy",marks:2,text:"Why is it important to connect new mathematics concepts to real life?",opts:["It makes lessons longer","It increases relevance and helps retention","It distracts learners","It is only for older students"],ans:1,ex:"Real‑world links improve understanding."},
+{id:43,domain:"Mathematics",marks:2,text:"What is the decimal equivalent of 3/5?",opts:["0.35","0.6","0.06","0.35"],ans:1,ex:"3/5 = 0.6."},
+{id:44,domain:"Science",marks:2,text:"Which process changes water into water vapour?",opts:["Condensation","Evaporation","Freezing","Melting"],ans:1,ex:"Evaporation turns liquid to gas."},
+{id:45,domain:"Elementary Technology",marks:2,text:"Which of the following is a safe online practice for primary pupils?",opts:["Sharing passwords with friends","Talking to strangers online","Using strong passwords and reporting cyberbullying","Downloading unknown files"],ans:2,ex:"Safety includes strong passwords and reporting."},
+{id:46,domain:"Primary Pedagogy",marks:2,text:"In a competency‑based curriculum, a teacher should assess:",opts:["Only final exams","What a learner can do (skills, knowledge, attitude)","Only memorisation","Attendance only"],ans:1,ex:"CBC focuses on demonstrated competencies."},
+{id:47,domain:"Mathematics",marks:2,text:"What is the volume of a cube with side length 4 cm?",opts:["16 cm³","64 cm³","12 cm³","48 cm³"],ans:1,ex:"Volume = 4×4×4 = 64 cm³."},
+{id:48,domain:"Science",marks:2,text:"Which of these is a carnivore?",opts:["Cow","Lion","Goat","Rabbit"],ans:1,ex:"Lion eats meat."},
+{id:49,domain:"Elementary Technology",marks:2,text:"What is the function of the 'Enter' key on a keyboard?",opts:["Delete text","Move to next line or execute command","Insert space","Capitalise letters"],ans:1,ex:"Enter confirms input or new line."},
+{id:50,domain:"Primary Pedagogy",marks:2,text:"A good primary mathematics teacher should use:",opts:["Only lectures","Manipulatives, games, and real‑life problem solving","Only textbooks","Only written tests"],ans:1,ex:"Active, concrete methods build numeracy."}
+];
+
+let currentQuestions = [...QUESTIONS];
+let userAnswers = {}, timerInt = null, secLeft = 7200, startTime = null, submitted = false;
+
+function startExam(){ userAnswers={}; submitted=false; secLeft=7200; startTime=Date.now(); showScreen('examScreen'); renderExam(); startTimer(); }
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); }
+function startTimer(){ clearInterval(timerInt); updateTimerDisplay(); timerInt=setInterval(()=>{ secLeft--; updateTimerDisplay(); if(secLeft<=0){ clearInterval(timerInt); submitExam(); } },1000); }
+function updateTimerDisplay(){ let h=Math.floor(secLeft/3600), m=Math.floor((secLeft%3600)/60), s=secLeft%60; let el=document.getElementById('timerEl'); el.textContent=h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); el.className='timer'+(secLeft<600?' warn':''); }
+function calcScore(){ let e=0; currentQuestions.forEach(q=>{ if(userAnswers[q.id]!==undefined && userAnswers[q.id]===q.ans) e+=q.marks; }); return e; }
+function updateStats(){ let cnt=Object.keys(userAnswers).length; document.getElementById('qCounter').textContent=cnt+'/50'; document.getElementById('liveSaved').textContent=cnt; document.getElementById('liveRem').textContent=50-cnt; document.getElementById('progressBar').style.width=(cnt/50*100)+'%'; }
+function renderExam(){ let c=document.getElementById('questionsContainer'); c.innerHTML=''; currentQuestions.forEach(q=>{ let card=document.createElement('div'); card.className='qcard'; card.id='qc-'+q.id; let html=`<div class="qmeta"><span class="qnum">Question ${q.id}</span><span class="qpts">${q.marks} marks | ${q.domain}</span></div><div class="qtext">${q.text}</div><div class="opts" id="opts-${q.id}">`; q.opts.forEach((opt,idx)=>{ let letter=String.fromCharCode(65+idx); html+=`<div class="opt" id="opt-${q.id}-${idx}" onclick="pickOption(${q.id},${idx})"><span class="opt-l">${letter}</span>${opt}</div>`; }); html+=`</div><div class="fb" id="fb-${q.id}"></div><div class="navrow"><button class="btn-save" id="sbtn-${q.id}" onclick="saveAnswer(${q.id})">Save Answer</button></div>`; card.innerHTML=html; c.appendChild(card); }); updateStats(); }
+function pickOption(qId,idx){ let btn=document.getElementById('sbtn-'+qId); if(btn && btn.classList.contains('saved')) return; for(let i=0;i<4;i++){ let e=document.getElementById(`opt-${qId}-${i}`); if(e) e.classList.remove('sel'); } document.getElementById(`opt-${qId}-${idx}`).classList.add('sel'); window['pending_'+qId]=idx; }
+function saveAnswer(qId){ let p=window['pending_'+qId]; if(p===undefined){ let btn=document.getElementById('sbtn-'+qId); btn.textContent='Select first'; setTimeout(()=>{if(btn)btn.textContent='Save Answer';},1500); return; } userAnswers[qId]=p; delete window['pending_'+qId]; let btn=document.getElementById('sbtn-'+qId); if(btn){ btn.textContent='Saved ✓'; btn.classList.add('saved'); btn.disabled=true; } updateStats(); }
+function confirmSubmit(){ let left=50-Object.keys(userAnswers).length; if(left>0 && !confirm(`${left} question(s) unsaved. Submit anyway?`)) return; submitExam(); }
+function submitExam(){ if(submitted) return; submitted=true; clearInterval(timerInt); let elapsed=Math.floor((Date.now()-startTime)/1000); let h=Math.floor(elapsed/3600), m=Math.floor((elapsed%3600)/60), s=elapsed%60; currentQuestions.forEach(q=>{ let ch=userAnswers[q.id], fb=document.getElementById('fb-'+q.id), card=document.getElementById('qc-'+q.id); for(let i=0;i<4;i++){ let opt=document.getElementById(`opt-${q.id}-${i}`); if(opt){ opt.classList.remove('sel'); opt.classList.add('disabled'); opt.onclick=null; } } if(ch===undefined){ document.getElementById(`opt-${q.id}-${q.ans}`).classList.add('showR'); card.classList.add('skipped'); fb.className='fb fskip'; fb.innerHTML=`❌ Not answered. Correct: ${String.fromCharCode(65+q.ans)}: ${q.opts[q.ans]}<br><em>${q.explanation}</em>`; } else if(ch===q.ans){ document.getElementById(`opt-${q.id}-${ch}`).classList.add('right'); card.classList.add('ok'); fb.className='fb fok'; fb.innerHTML=`✅ Correct (+${q.marks} marks)<br><em>${q.explanation}</em>`; } else{ document.getElementById(`opt-${q.id}-${ch}`).classList.add('wrong'); document.getElementById(`opt-${q.id}-${q.ans}`).classList.add('showR'); card.classList.add('fail'); fb.className='fb fbad'; fb.innerHTML=`❌ Incorrect. Correct: ${String.fromCharCode(65+q.ans)}: ${q.opts[q.ans]}<br><em>${q.explanation}</em>`; } let btn=document.getElementById('sbtn-'+q.id); if(btn) btn.style.display='none'; }); let correct=0,wrong=0,skip=0; currentQuestions.forEach(q=>{ let a=userAnswers[q.id]; if(a===undefined) skip++; else if(a===q.ans) correct++; else wrong++; }); let score=calcScore(); document.getElementById('finalScore').innerHTML=score; let grade,bg,tc; if(score>=80){grade='Excellent';bg='#eafaf1';tc='#1e6f3f';} else if(score>=70){grade='Very Good';bg='#eef2fc';tc='#2c5e3a';} else if(score>=60){grade='Pass';bg='#fef9e6';tc='#b45309';} else{grade='Fail';bg='#fef2f2';tc='#b91c1c';} let gb=document.getElementById('gradeBadge'); gb.innerText=grade; gb.style.background=bg; gb.style.color=tc; document.getElementById('rC').innerText=correct; document.getElementById('rW').innerText=wrong; document.getElementById('rS').innerText=skip; document.getElementById('rTime').innerText=(h>0?h+'h ':'')+m+'m '+s+'s'; document.getElementById('rPct').innerText=score+'%'; document.getElementById('rResult').innerText=score>=60?'PASS ✓':'FAIL ✗'; let domains={}; currentQuestions.forEach(q=>{ let d=q.domain; if(!domains[d]) domains[d]={total:0,earned:0}; domains[d].total+=q.marks; if(userAnswers[q.id]===q.ans) domains[d].earned+=q.marks; }); let catDiv=document.getElementById('catBreakdown'); catDiv.innerHTML=''; let domainColors={'Mathematics':'#2c5e3a','Science':'#2980b9','Elementary Technology':'#e67e22','Primary Pedagogy':'#8e44ad'}; for(let [dom,data] of Object.entries(domains)){ let pct=Math.round((data.earned/data.total)*100); let col=domainColors[dom]||'#2c5e3a'; catDiv.innerHTML+=`<div class="catrow"><div class="catlbl" style="color:${col}">${dom}</div><div class="catbw"><div class="catbar" style="width:${pct}%;background:${col}"></div></div><div class="catpct">${pct}%</div></div>`; } showScreen('resultScreen'); }
+function reviewAnswers(){ let rc=document.getElementById('reviewContainer'); rc.innerHTML=''; currentQuestions.forEach(q=>{ let uc=userAnswers[q.id], card=document.createElement('div'); card.className='qcard'; if(uc===q.ans) card.classList.add('ok'); else if(uc!==undefined) card.classList.add('fail'); else card.classList.add('skipped'); let html=`<div class="qmeta"><span class="qnum">Q${q.id} (${q.domain})</span><span class="qpts">${q.marks} marks</span></div><div class="qtext">${q.text}</div><div class="opts">`; q.opts.forEach((opt,idx)=>{ let cls='opt disabled'; if(idx===q.ans) cls+=' showR'; if(uc===idx && idx!==q.ans) cls+=' wrong'; let letter=String.fromCharCode(65+idx); html+=`<div class="${cls}"><span class="opt-l">${letter}</span>${opt}`; if(idx===q.ans) html+=` <span style="font-size:11px;">(correct)</span>`; if(uc===idx && idx!==q.ans) html+=` <span style="font-size:11px;">(your answer)</span>`; html+=`</div>`; }); html+=`</div><div class="fb fok" style="display:block">${q.explanation}</div>`; card.innerHTML=html; rc.appendChild(card); }); showScreen('reviewScreen'); }
+function restartExam(){ clearInterval(timerInt); showScreen('startScreen'); }
+</script>
+</body>
+</html>
